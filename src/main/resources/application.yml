@@ -1,0 +1,75 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/minitalk
+    username: minitalk
+    password: minitalk123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/minitalk
+    redis:
+      host: localhost
+      port: 6379
+      password: redis123
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:database/migration/V1__init.sql
+
+jwt:
+  secret: minitalk-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256
+  access-token-expiry: 1800000
+  refresh-token-expiry: 604800000
+
+websocket:
+  allowed-origins: http://localhost:3000,http://localhost:5173
+
+minio:
+  endpoint: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin123
+  bucket-name: minitalk
+
+kurento:
+  ws-uri: ws://localhost:8888/kurento
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+logging:
+  level:
+    com.minitalk: DEBUG
+    org.springframework.web.socket: DEBUG

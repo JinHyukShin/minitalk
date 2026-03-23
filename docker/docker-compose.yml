@@ -1,0 +1,147 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: minitalk-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-minitalk}
+      POSTGRES_USER: ${POSTGRES_USER:-minitalk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-minitalk123}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U minitalk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - minitalk_network
+
+  mongodb:
+    image: mongo:7
+    container_name: minitalk-mongodb
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-minitalk}
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - minitalk_network
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: minitalk-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis123}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis123", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - minitalk_network
+
+  minio:
+    image: minio/minio:latest
+    container_name: minitalk-minio
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - minitalk_network
+
+  kurento:
+    image: kurento/kurento-media-server:7.0
+    container_name: minitalk-kurento
+    ports:
+      - "8888:8888"
+    environment:
+      KMS_STUN_IP: stun.l.google.com
+      KMS_STUN_PORT: 19302
+      KMS_TURN_URL: ${TURN_USER:-minitalk}:${TURN_PASSWORD:-minitalk123}@coturn:3478
+    networks:
+      - minitalk_network
+
+  coturn:
+    image: coturn/coturn:latest
+    container_name: minitalk-coturn
+    ports:
+      - "3478:3478"
+      - "3478:3478/udp"
+      - "5349:5349"
+      - "5349:5349/udp"
+      - "49152-49200:49152-49200/udp"
+    command: >
+      -n
+      --listening-port=3478
+      --tls-listening-port=5349
+      --min-port=49152
+      --max-port=49200
+      --fingerprint
+      --lt-cred-mech
+      --user=${TURN_USER:-minitalk}:${TURN_PASSWORD:-minitalk123}
+      --realm=minitalk.local
+    networks:
+      - minitalk_network
+
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: minitalk-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-minitalk}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-minitalk}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-minitalk123}
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/${MONGO_DB:-minitalk}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD:-redis123}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+      KURENTO_WS_URI: ws://kurento:8888/kurento
+    networks:
+      - minitalk_network
+
+volumes:
+  postgres_data:
+  mongo_data:
+  redis_data:
+  minio_data:
+
+networks:
+  minitalk_network:
+    driver: bridge

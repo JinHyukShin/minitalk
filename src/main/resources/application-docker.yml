@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/minitalk
+  data:
+    mongodb:
+      uri: mongodb://mongodb:27017/minitalk
+    redis:
+      host: redis
+
+minio:
+  endpoint: http://minio:9000
+
+kurento:
+  ws-uri: ws://kurento:8888/kurento

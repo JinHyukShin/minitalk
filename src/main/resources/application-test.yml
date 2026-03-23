@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/minitalk_test
+    username: minitalk
+    password: minitalk123
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/minitalk_test
+    redis:
+      host: localhost
+      port: 6379
+      password: redis123
+  sql:
+    init:
+      mode: never
+
+jwt:
+  secret: test-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256-test
+  access-token-expiry: 1800000
+  refresh-token-expiry: 604800000
+
+logging:
+  level:
+    com.minitalk: DEBUG
