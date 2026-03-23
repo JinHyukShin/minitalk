@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/minitalk_test
     username: minitalk
-    password: minitalk123
+    password: ${DB_PASSWORD:testpass}
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -12,13 +12,13 @@ spring:
     redis:
       host: localhost
       port: 6379
-      password: redis123
+      password: ${REDIS_PASSWORD:testpass}
   sql:
     init:
       mode: never
 
 jwt:
-  secret: test-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256-test
+  secret: ${JWT_SECRET:test-only-secret-key-not-for-production-min-32chars}
   access-token-expiry: 1800000
   refresh-token-expiry: 604800000
 

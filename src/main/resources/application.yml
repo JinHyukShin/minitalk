@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/minitalk
     username: minitalk
-    password: minitalk123
+    password: ${DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -23,7 +23,7 @@ spring:
     redis:
       host: localhost
       port: 6379
-      password: redis123
+      password: ${REDIS_PASSWORD:}
 
   servlet:
     multipart:
@@ -36,7 +36,7 @@ spring:
       schema-locations: classpath:database/migration/V1__init.sql
 
 jwt:
-  secret: minitalk-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256
+  secret: ${JWT_SECRET:}
   access-token-expiry: 1800000
   refresh-token-expiry: 604800000
 
@@ -45,8 +45,8 @@ websocket:
 
 minio:
   endpoint: http://localhost:9000
-  access-key: minioadmin
-  secret-key: minioadmin123
+  access-key: ${MINIO_ACCESS_KEY:}
+  secret-key: ${MINIO_SECRET_KEY:}
   bucket-name: minitalk
 
 kurento:
