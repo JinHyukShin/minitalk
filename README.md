@@ -47,12 +47,12 @@ PostgreSQL  MongoDB  Redis  MinIO
 - **다중 인스턴스 스케일링**: Redis Pub/Sub 메시지 브로드캐스트
 - **JWT 인증**: Access/Refresh 토큰 + WebSocket STOMP 인증
 
-## API Endpoints
+## API 엔드포인트
 
 ### REST API
 
-| Method | Path | Description |
-|--------|------|-------------|
+| 메서드 | 경로 | 설명 |
+|--------|------|------|
 | POST | /api/v1/auth/signup | 회원가입 |
 | POST | /api/v1/auth/login | 로그인 |
 | POST | /api/v1/auth/refresh | 토큰 갱신 |
@@ -68,20 +68,20 @@ PostgreSQL  MongoDB  Redis  MinIO
 | POST | /api/v1/calls/start | 통화 시작 |
 | GET | /api/v1/presence/online | 온라인 사용자 |
 
-### WebSocket STOMP Destinations
+### WebSocket STOMP 구독 경로
 
-| Direction | Destination | Description |
-|-----------|------------|-------------|
-| SUBSCRIBE | /topic/room/{roomId} | 채팅방 메시지 |
-| SUBSCRIBE | /topic/room/{roomId}/typing | 타이핑 표시 |
-| SUBSCRIBE | /topic/room/{roomId}/read | 읽음 확인 |
-| SUBSCRIBE | /user/queue/notifications | 개인 알림 |
-| SUBSCRIBE | /user/queue/signal | WebRTC 시그널링 |
-| SEND | /app/chat/{roomId} | 메시지 전송 |
-| SEND | /app/chat/{roomId}/typing | 타이핑 시작/중지 |
-| SEND | /app/chat/{roomId}/read | 읽음 확인 |
-| SEND | /app/signal/sdp-offer | SDP Offer |
-| SEND | /app/signal/ice-candidate | ICE Candidate |
+| 방향 | 경로 | 설명 |
+|------|------|------|
+| 구독 (SUBSCRIBE) | /topic/room/{roomId} | 채팅방 메시지 |
+| 구독 (SUBSCRIBE) | /topic/room/{roomId}/typing | 타이핑 표시 |
+| 구독 (SUBSCRIBE) | /topic/room/{roomId}/read | 읽음 확인 |
+| 구독 (SUBSCRIBE) | /user/queue/notifications | 개인 알림 |
+| 구독 (SUBSCRIBE) | /user/queue/signal | WebRTC 시그널링 |
+| 전송 (SEND) | /app/chat/{roomId} | 메시지 전송 |
+| 전송 (SEND) | /app/chat/{roomId}/typing | 타이핑 시작/중지 |
+| 전송 (SEND) | /app/chat/{roomId}/read | 읽음 확인 |
+| 전송 (SEND) | /app/signal/sdp-offer | SDP Offer |
+| 전송 (SEND) | /app/signal/ice-candidate | ICE Candidate |
 
 ## 실행 방법
 
